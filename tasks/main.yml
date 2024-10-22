@@ -1,44 +1,87 @@
----
-- name: install packages
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-  loop:
-    - git
-    - apt-transport-https
-    - nginx
 
-- name: check out master branch
-  git:
-    repo: 'https://github.com/monicahq/monica'
-    dest: /srv/monicahq
-    version: master
+#Роль переписана под пакеты rpm на Centos7 b php 7 - это все EOL и требует "подгонки по месту"
+#Stop the executing if not whis role
+fail:
+Debug:
+msg: «Эта роль для работы с другой ОС»
 
-- name: Add the user
-  user:
-    name: monicahq
-    shell: /usr/bin/nologin
-    home: /srv/monicahq
+When: ansible_os_family!= «CentOS»
 
-- name: Install sury key
-  apt_key:
-    url: 'https://packages.sury.org/php/apt.gpg'
-    state: present
+#Stop the executing if not whis version
+fail:
+Debug:
+msg: «Эта роль для работы с другой ОС»
 
-- name: Add sury repositories
-  apt_repository:
-    repo: "deb https://packages.sury.org/php/ stretch main"
-    state: present
-    update_cache: yes
-    filename: 'sury'
+When: ansible_os_family!= «CentOS»
 
+-name: install packages (с версии Питон 2.6 рекомендовано написано_здесь использовать этот компонент)
+Ansible.builtin.dnf:
+#переменную возьмет из цикла
+loop:
+- git
+- #не требуется ключи протокол https— yum  и так умеет работать по https
+state: present
+update_cache: yes
+
+-name: nginx
+#здесь я так понимаю нужна версия на что ставим
+ ansible.builtin.dnf:
+    name: 'http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm'
+ state: present
+
+- name: checkout master branch
+#как я понял из описания целевого состояния нужно в папке srv/dest(?!) развернуть локально репозиторий с веткой master
+
+git: 
+ 
+#1. вначале инциализируем git в #директории srv- Обычно конечно в home git  Удивляет что папка srv #используется- в ней лежат данные для #всех системных служб.(!)
+
+md/srv/monicahq
+
+#инициализация- считаем что его нет еще
+git init
+#добавляем удаленный репозиторий
+
+ git remote add origin https://github.com/monicahq/monica
+
+#переключаемся на ветку master
+git checkout master
+
+#дальше не понимаю — вроде установка ключа для apt, но аналогичной вещи для yum нет
+И вообще sury
+перестал ключи использовать
+
+По умолчанию ключи во встроенном модуле Ansible выключены.
+
+
+#Еще ниже похоже идет развертывание PHP
+но с учетом описанного придется идти по другому пути: 
+
+перепишем тогда творчески на работу с новым репозиторием
+
+ name: Add php repositories
+
+# Внимание! Поддержка 7 закончилась, репо SURY заблокировал Россию- используем другой https://rpms.remirepo.net/enterprise/  но Enterprise Linux 7 has reached its "End Of Life" in May 2024.
+
+ansible.builtin.dnf:
+    name: 'https://rpms.remirepo.net/enterprise/remi-release-7.rpm'
+    state: presentUvh hms.remirepo.net/enterpri
 - name: install php dependencies
-  apt:
+Downloading Package Dependencies
+ansible.builtin.dnf:
     name: "{{ item }}"
     state: present
     update_cache: yes
-  loop:
+# sudo dnf download --resolve <package-name>
+
+
+ - name: install php 
+ansible.builtin.dnf:
+    name: https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    state: present
+    update_cache: yes
+#не все пакеты нашел в репозитории  
+ loop:
     - php7.3
     - php7.3-cli
     - php7.3-intl
@@ -115,11 +158,18 @@
   template:
     src: monicahq.conf.j2
     dest: /etc/nginx/sites-enabled/monica.conf
+ cp_ /etc/nginx/sites-enabled/monica.con
 - name: Remove default nginx configuration
   file:
     path: /etc/nginx/sites-enabled/default
     state: absent
+
 - name: reload service nginx
+  become: true
+  systemd:
+    name: nginx
+    state: reloaded
+
   become: true
   systemd:
     name: nginx
