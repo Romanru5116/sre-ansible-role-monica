@@ -1,3 +1,8 @@
+#скорректированная роль под пакеты RPM
+#Автор Рубцов Р
+#Внимание: все версии Centos 7 и php7 в EOL
+
+
 Monica Crm Role
 =========
 [![Galaxy](https://img.shields.io/badge/galaxy-kevit.monica-blue.svg?style=flat)](https://galaxy.ansible.com/kevit/monica)
@@ -12,6 +17,7 @@ Any pre-requisites that may not be covered by Ansible itself or the role should 
 
 Role Variables
 --------------
+описывать нет смысла - пременные указаны в самих тасках
 
 | Name              | Default Value       | Description          |
 |-------------------|---------------------|----------------------|
