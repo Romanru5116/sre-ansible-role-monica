@@ -1,4 +1,8 @@
 Monica Crm Role
+
+изменен сам код (папка tasks/main.yml) - под Rpm пакеты - Centos в частности. По сравнению с имеющимся базовым кодом c apt пришлось задействовать встроенный модуль ANSIBLE - ansible.builtin.dnf, ; сделать проверку что эта ОС Centos;  как это все заживет в реальности не понимаю- честно скажу - ключи репозитория, завиcbмости пакетов и  molecule - это новые вещи для меня
+
+
 =========
 [![Galaxy](https://img.shields.io/badge/galaxy-kevit.monica-blue.svg?style=flat)](https://galaxy.ansible.com/kevit/monica)
 [![Build Status](https://travis-ci.org/kevit/ansible-role-monica.svg?branch=master)](https://travis-ci.org/kevit/ansible-role-monica)
@@ -17,7 +21,7 @@ Role Variables
 |-------------------|---------------------|----------------------|
 | `` | `` |  |
 
-
+Переменные используются внутренние  
 Dependencies
 ------------
 
