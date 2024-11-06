@@ -7,8 +7,22 @@ lint:
   options:
     config-file: molecule/default/yamllint.yml
 platforms:
-  - name: ansible-role-monica-test
+  - name: monica-test
+    #centos
+  image: milcom/centos7-systemd
+  WHEN ansible_facts ="Centos" 
+    #это образ centos7 
+
+      #debian
+  image: milcom/centos7-systemd
+  WHEN ansible_facts ="Debian"
+  # это образ Centos
+   -name:monica-test
     image: "geerlingguy/docker-debian9-ansible"
+    WHEN ansible_facts ="Debian"
+    #это образ Debian
+    
+       #строки ниже были чьими-то    
     command: ${MOLECULE_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
