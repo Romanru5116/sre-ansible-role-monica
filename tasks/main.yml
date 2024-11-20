@@ -1,13 +1,10 @@
 
 #В роле выделены отдельные сценарии- здесь ниже -   для Centos7 и  php 7 -  и сов#совсем ниже - deb. Все это требует "подгонки по месту"
 #************выполнение задач под Centos****************
-
-tasks:
-  - name: Get service facts
-  setup:
-    filter: 'ansible_os_family'
-  
--name RunForCentos
+- name install git Nginx and  configure and start Nginx
+  when:ansible_facts['distiribution']== 'CentOS'
+  block
+    -name RunForCent
 #выполнение задач под centos
     assert 
      that
@@ -54,7 +51,7 @@ git checkout master
 
 
 #Еще ниже похоже идет развертывание PHP
-но с учетом описанного придется идти по другому пути: 
+#но с учетом описанного придется идти по другому пути: 
 
 перепишем тогда на работу с новым репозиторием
 
@@ -65,8 +62,8 @@ git checkout master
 ansible.builtin.dnf:
     name: 'https://rpms.remirepo.net/enterprise/remi-release-7.rpm'
     state: presentUvh hms.remirepo.net/enterpri
-- name: install php dependencies
-Downloading Package Dependencies
+-    name: install php dependencies
+# Downloading Package Dependencies
 ansible.builtin.dnf:
     name: "{{ item }}"
     state: present
